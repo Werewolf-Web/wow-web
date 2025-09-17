@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playlist Manager | Adult Content</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+  /* General */
+  body {
+    font-family: 'Arial', sans-serif;
+    background: #121212;
+    color: #fff;
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #e63946;
+    padding: 15px 20px;
+    flex-wrap: wrap;
+  }
+
+  header .logo {
+    font-size: 22px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .search-bar {
+    display: flex;
+    flex: 1;
+    max-width: 400px;
+    margin: 10px 0;
+    gap: 5px;
+  }
+
+  .search-bar input {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 4px 0 0 4px;
+    border: none;
+    outline: none;
+    background: #2c2c2c;
+    color: #fff;
+  }
+
+  .search-bar button {
+    background: #fff;
+    color: #e63946;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .user-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .user-actions button {
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+
+  .user-actions button:hover {
+    opacity: 0.8;
+  }
+
+  .user-actions .primary {
+    background: #fff;
+    color: #e63946;
+  }
+
+  /* Container */
+  .container {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 250px;
+    background: #1f1f1f;
+    border-radius: 8px;
+    padding: 15px;
+    flex-shrink: 0;
+  }
+
+  .sidebar h3 {
+    color: #e63946;
+    margin-bottom: 10px;
+  }
+
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .sidebar li {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: 0.2s;
+  }
+
+  .sidebar li:hover,
+  .sidebar li.active {
+    background: #333;
+    font-weight: bold;
+  }
+
+  /* Content */
+  .content {
+    flex: 1;
+    min-width: 300px;
+  }
+
+  .playlist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+  }
+
+  .playlist-header h2 {
+    margin: 0;
+  }
+
+  .playlist-actions button {
+    background: #e63946;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .playlist-actions button:hover {
+    opacity: 0.85;
+  }
+
+  /* Video List */
+  .video-list {
+    background: #1f1f1f;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .video-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    flex-wrap: wrap;
+    transition: 0.3s;
+  }
+
+  .video-item:hover {
+    background: #2c2c2c;
+  }
+
+  .video-thumb {
+    width: 120px;
+    height: 70px;
+    background: #444;
+    cursor: pointer;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .video-info {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .video-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+
+  .video-meta {
+    font-size: 12px;
+    color: #aaa;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .video-actions {
+    display: flex;
+    gap: 5px;
+  }
+
+  .video-actions button {
+    background: none;
+    border: none;
+    color: #e63946;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.2s;
+  }
+
+  .video-actions button:hover {
+    transform: scale(1.2);
+  }
+
+  /* Modals & Player */
+  .modal,
+  .player-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 1000;
+    padding: 10px;
+  }
+
+  .modal-content,
+  .player-box {
+    background: #1f1f1f;
+    border-radius: 8px;
+    padding: 20px;
+    width: 500px;
+    max-width: 100%;
+  }
+
+  .player-box {
+    width: 80%;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .player-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 18px;
+  }
+
+  .video-player iframe {
+    width: 100%;
+    height: 400px;
+    border-radius: 8px;
+  }
+
+  .close-btn {
+    background: #e63946;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    color: #fff;
+    border-radius: 4px;
+  }
+
+  /* Forms */
+  .form-group {
+    margin-bottom: 10px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: none;
+    background: #333;
+    color: #fff;
+    outline: none;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .form-actions .cancel {
+    background: #555;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .form-actions .save {
+    background: #e63946;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  /* Age Verification */
+  .age-verification {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(18, 18, 18, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+  }
+
+  .verification-box {
+    background: #1f1f1f;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+  }
+
+  .verification-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+  }
+
+  .verification-buttons button {
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+
+  .verification-buttons .exit {
+    background: #555;
+    color: #fff;
+  }
+
+  .verification-buttons .exit:hover {
+    opacity: 0.8;
+  }
+
+  .verification-buttons .enter {
+    background: #e63946;
+    color: #fff;
+  }
+
+  .verification-buttons .enter:hover {
+    opacity: 0.85;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .container {
+      flex-direction: column;
+    }
+
+    .sidebar {
+      width: 100%;
+    }
+
+    .video-player iframe {
+      height: 250px;
+    }
+  }
+</style>
+
+</head>
+
+<body>
+
+  <!-- Age verification -->
+  <div class="age-verification">
+    <div class="verification-box">
+      <h2>Age Verification</h2>
+      <p>This content is intended for adults only. You must be 18 years or older to access this site.</p>
+      <div class="verification-buttons">
+        <button class="exit" onclick="window.location.href='https://www.google.com'">Exit</button>
+        <button class="enter" onclick="verifyAge()">I am 18 or older</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <div class="logo"><i class="fas fa-play-circle"></i> PlaylistManager</div>
+      <div class="search-bar">
+        <input type="text" placeholder="Search videos...">
+        <button><i class="fas fa-search"></i></button>
+      </div>
+      <div class="user-actions">
+        <button><i class="fas fa-bell"></i></button>
+        <button class="primary"><i class="fas fa-user"></i> My Account</button>
+      </div>
+    </header>
+
+    <div class="main-content">
+      <div class="sidebar">
+        <h3><i class="fas fa-list"></i> My Playlists</h3>
+        <ul>
+          <li class="active"><i class="fas fa-heart"></i> Favorites</li>
+          <li><i class="fas fa-clock"></i> Watch Later</li>
+          <li><i class="fas fa-star"></i> Top Rated</li>
+        </ul>
+      </div>
+
+      <div class="content">
+        <div class="playlist-header">
+          <h2><i class="fas fa-heart"></i> Favorites Playlist</h2>
+          <div class="playlist-actions">
+            <button class="primary" id="addVideoBtn"><i class="fas fa-plus"></i> Add Video</button>
+          </div>
+        </div>
+
+        <div class="video-list" id="videoList">
+          <div class="video-item">
+            <div class="video-thumb" data-video="Sample Video"
+              data-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"></div>
+            <div class="video-info">
+              <div class="video-title">Sample Video</div>
+              <div class="video-meta">
+                <span>Added: Today</span>
+                <span class="video-domain">youtube.com</span>
+              </div>
+            </div>
+            <div class="video-actions">
+              <button class="play-btn" data-video="Sample Video"
+                data-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><i class="fas fa-play"></i></button>
+              <button class="delete-btn"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Video Modal -->
+  <div class="modal" id="addVideoModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Add Video to Playlist</h3>
+        <button id="closeModalBtn">&times;</button>
+      </div>
+      <div class="form-group">
+        <label for="videoUrl">Video URL</label>
+        <input type="text" id="videoUrl" placeholder="Enter video URL">
+      </div>
+      <div class="form-group">
+        <label for="videoTitle">Title</label>
+        <input type="text" id="videoTitle" placeholder="Enter video title">
+      </div>
+      <div class="form-actions">
+        <button class="cancel" id="cancelAddBtn">Cancel</button>
+        <button class="save" id="saveVideoBtn">Add Video</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Player -->
+  <div class="player-container" id="playerContainer">
+    <div class="player-box">
+      <div class="player-header">
+        <h3 id="playerTitle">Video Title</h3>
+        <button id="closePlayerBtn">&times;</button>
+      </div>
+      <div class="video-player" id="videoPlayer">
+        <i class="fas fa-play-circle" style="font-size: 48px;"></i>
+        <p>Playing content...</p>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // --- Age Verification ---
+  function verifyAge() {
+    document.querySelector('.age-verification').style.display = 'none';
+    alert('Age verified!');
+  }
+
+  // --- Modal Handlers ---
+  document.getElementById('addVideoBtn').onclick = () => document.getElementById('addVideoModal').style.display = 'flex';
+  document.getElementById('closeModalBtn').onclick = () => document.getElementById('addVideoModal').style.display = 'none';
+  document.getElementById('cancelAddBtn').onclick = () => document.getElementById('addVideoModal').style.display = 'none';
+
+  // --- Video Player ---
+  function playVideo(title, url) {
+    document.getElementById("playerTitle").textContent = title;
+    let embedUrl = url;
+
+    if (url.includes("youtube.com/watch")) {
+      const videoId = new URL(url).searchParams.get("v");
+      embedUrl = "https://www.youtube.com/embed/" + videoId;
+    } else if (url.includes("vimeo.com") && !url.includes("player.vimeo.com")) {
+      const videoId = url.split("/").pop();
+      embedUrl = "https://player.vimeo.com/video/" + videoId;
+    } else if (url.includes("sexvid.pro") && !url.includes("/embed/")) {
+      alert("Sexvid.pro requires embed URL. Opening in new tab.");
+      window.open(url, "_blank");
+      return;
+    }
+
+    const iframe = document.createElement("iframe");
+    iframe.src = embedUrl;
+    iframe.width = "100%";
+    iframe.height = "100%";
+    iframe.setAttribute("frameborder", "0");
+    iframe.setAttribute("allowfullscreen", "true");
+
+    const player = document.getElementById("videoPlayer");
+    player.innerHTML = "";
+    player.appendChild(iframe);
+    document.getElementById("playerContainer").style.display = "flex";
+  }
+
+  document.getElementById("closePlayerBtn").onclick = () => {
+    document.getElementById("playerContainer").style.display = "none";
+  };
+
+  // --- Video Item Handlers ---
+  function addEventListenersToVideo(videoElement) {
+    const playBtn = videoElement.querySelector(".play-btn");
+    const deleteBtn = videoElement.querySelector(".delete-btn");
+    const thumb = videoElement.querySelector(".video-thumb");
+
+    playBtn.onclick = () => playVideo(playBtn.dataset.video, playBtn.dataset.url);
+    thumb.onclick = () => playVideo(thumb.dataset.video, thumb.dataset.url);
+
+    deleteBtn.onclick = () => {
+      videoElement.remove();
+      savePlaylistToLocalStorage();
+    };
+  }
+
+  // --- Save to Local Storage ---
+  function savePlaylistToLocalStorage() {
+    const videos = [];
+    document.querySelectorAll('.video-item').forEach(item => {
+      const title = item.querySelector('.video-title').textContent;
+      const url = item.querySelector('.play-btn').dataset.url;
+      videos.push({ title, url });
+    });
+    localStorage.setItem('playlist', JSON.stringify(videos));
+  }
+
+  // --- Load from Local Storage ---
+  function loadPlaylistFromLocalStorage() {
+    const savedVideos = JSON.parse(localStorage.getItem('playlist')) || [];
+    const videoList = document.getElementById('videoList');
+    videoList.innerHTML = ''; // clear existing
+    savedVideos.forEach(video => {
+      const div = document.createElement('div');
+      div.className = 'video-item';
+      div.innerHTML = `
+        <div class="video-thumb" data-video="${video.title}" data-url="${video.url}"></div>
+        <div class="video-info">
+            <div class="video-title">${video.title}</div>
+            <div class="video-meta"><span>Added: Now</span><span class="video-domain">${video.url}</span></div>
+        </div>
+        <div class="video-actions">
+            <button class="play-btn" data-video="${video.title}" data-url="${video.url}"><i class="fas fa-play"></i></button>
+            <button class="delete-btn"><i class="fas fa-trash"></i></button>
+        </div>
+      `;
+      videoList.appendChild(div);
+      addEventListenersToVideo(div);
+    });
+  }
+
+  // --- Add Video Button ---
+  document.getElementById('saveVideoBtn').onclick = () => {
+    const title = document.getElementById('videoTitle').value;
+    const url = document.getElementById('videoUrl').value;
+    if (!title || !url) { alert('Fill all fields'); return; }
+
+    const videoList = document.getElementById('videoList');
+    const div = document.createElement('div');
+    div.className = 'video-item';
+    div.innerHTML = `
+      <div class="video-thumb" data-video="${title}" data-url="${url}"></div>
+      <div class="video-info">
+          <div class="video-title">${title}</div>
+          <div class="video-meta"><span>Added: Now</span><span class="video-domain">${url}</span></div>
+      </div>
+      <div class="video-actions">
+          <button class="play-btn" data-video="${title}" data-url="${url}"><i class="fas fa-play"></i></button>
+          <button class="delete-btn"><i class="fas fa-trash"></i></button>
+      </div>
+    `;
+    videoList.prepend(div);
+    addEventListenersToVideo(div);
+    savePlaylistToLocalStorage(); // Save after adding
+    document.getElementById('addVideoModal').style.display = 'none';
+    document.getElementById('videoTitle').value = '';
+    document.getElementById('videoUrl').value = '';
+  };
+
+  // --- Initialize ---
+  loadPlaylistFromLocalStorage();
+</script>
+
+
+</body>
+
+</html>
